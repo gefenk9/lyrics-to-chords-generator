@@ -29,6 +29,16 @@ class ChordieParser(HTMLParser):
         else:
             return None
 
+    def fix_matching(self, lyrics, chords):
+        if lyrics[0].strip() == "":
+            lyrics.pop(0)
+        if len(lyrics) > len(chords):
+            for index, line in enumerate(lyrics):
+                if line.strip() == "":
+                    chords.insert(index, line)
+        return lyrics, chords
+
+
 
     def parse(self, data):
         try:
@@ -47,35 +57,35 @@ class ChordieParser(HTMLParser):
                     else:
                         lyrics.append(line)
 
+            lyrics, chords = self.fix_matching(lyrics, chords)
+
             chords = "\n".join(chords)
             lyrics = "\n".join(lyrics)
 
-            print("lyrics:\n {} \n chords :\n {}".format(lyrics, chords))
+            #print("lyrics:\n {} \n chords :\n {}".format(lyrics, chords))
             return lyrics, chords
         except Exception as e:
             print(e.message)
 
+dir = r'C:\Users\gefenk\Documents\Deep Learning\chords_to_lyrics_generator\data\pre'
+dir_out = r'C:\Users\gefenk\Documents\Deep Learning\chords_to_lyrics_generator\data\lyrics_chords'
+
+for root, dirs, files in os.walk(dir):
+    for file in files:
+        with open(os.path.join(dir, file)) as f:
+            data = f.read()
+
+        # Parsing the lyrics and chords from the html tag
+        parser = ChordieParser()
+        name = file.split('.')[-1]
+        lyrics, chords = parser.parse(str(data))
+
+        # Creating the corresponding lyrics and chords files to the song
+        with open(os.path.join(dir_out, name+".lyrics"), 'w+') as lyrics_file:
+            lyrics_file.write(lyrics)
+
+        with open(os.path.join(dir_out, name+".chords"), 'w+') as chords_file:
+            chords_file.write(chords)
 
 
-name = r"www.e-chords.com.chords.-luke-phua-kay-kiat-.my-saviour-my-lord"
-dir = r'C:\Users\gefenk\Desktop'
-with open(os.path.join(dir, name)) as f:
-    data = f.read()
-
-parser = ChordieParser()
-parser.parse(str(data))
-
-
-
-
-"""
-opener = urllib.request.FancyURLopener({})
-url = "https://www.chordie.com/chord.pere/www.azchords.com/t/taylorswift-tabs-34955/shakeitoff2-tabs-877676.html"
-f = opener.open(url)
-content = f.read()
-
-parser = ChordieParser()
-parser.feed(str(content))
-
-"""
 
