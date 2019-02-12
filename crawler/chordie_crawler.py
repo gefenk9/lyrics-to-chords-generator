@@ -72,20 +72,23 @@ dir_out = r'C:\Users\gefenk\Documents\Deep Learning\chords_to_lyrics_generator\d
 
 for root, dirs, files in os.walk(dir):
     for file in files:
-        with open(os.path.join(dir, file)) as f:
-            data = f.read()
+        try:
+            with open(os.path.join(dir, file)) as f:
+                data = f.read()
 
-        # Parsing the lyrics and chords from the html tag
-        parser = ChordieParser()
-        name = file.split('.')[-1]
-        lyrics, chords = parser.parse(str(data))
+            # Parsing the lyrics and chords from the html tag
+            parser = ChordieParser()
+            name = file.split('.')[-1]
+            lyrics, chords = parser.parse(str(data))
 
-        # Creating the corresponding lyrics and chords files to the song
-        with open(os.path.join(dir_out, name+".lyrics"), 'w+') as lyrics_file:
-            lyrics_file.write(lyrics)
+            # Creating the corresponding lyrics and chords files to the song
+            with open(os.path.join(dir_out, name+".lyrics"), 'w+') as lyrics_file:
+                lyrics_file.write(lyrics)
 
-        with open(os.path.join(dir_out, name+".chords"), 'w+') as chords_file:
-            chords_file.write(chords)
+            with open(os.path.join(dir_out, name+".chords"), 'w+') as chords_file:
+                chords_file.write(chords)
+        except Exception as e:
+            print (e)
 
 
 
