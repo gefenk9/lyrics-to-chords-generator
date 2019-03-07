@@ -3,8 +3,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 
-
+from model.create_training_data import prep_data
 torch.manual_seed(1)
+
+def prepare_sequence(seq, to_ix):
+    idxs = [to_ix[w] for w in seq]
+    return torch.tensor(idxs, dtype=torch.long)
+
 class LSTMTagger(nn.Module):
 
     def __init__(self, embedding_dim, hidden_dim, vocab_size, tagset_size):
@@ -38,6 +43,9 @@ class LSTMTagger(nn.Module):
         return tag_scores
 
 
+word_to_ix, tag_to_ix = prep_data()
+EMBEDDING_DIM=6
+HIDDEN_DIM=6
 model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
 loss_function = nn.NLLLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1)
