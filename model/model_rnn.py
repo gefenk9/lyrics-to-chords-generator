@@ -43,7 +43,7 @@ class LSTMTagger(nn.Module):
         return tag_scores
 
 
-word_to_ix, tag_to_ix = prep_data()
+word_to_ix, tag_to_ix, training_data = prep_data()
 EMBEDDING_DIM=6
 HIDDEN_DIM=6
 model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
@@ -54,7 +54,7 @@ optimizer = optim.SGD(model.parameters(), lr=0.1)
 # Note that element i,j of the output is the score for tag j for word i.
 # Here we don't need to train, so the code is wrapped in torch.no_grad()
 with torch.no_grad():
-    inputs = prepare_sequence(training_data[0][0], word_to_ix)
+    inputs = prepare_sequence(training_data[1][0], word_to_ix)
     tag_scores = model(inputs)
     print(tag_scores)
 
@@ -84,7 +84,7 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
 
 # See what the scores are after training
 with torch.no_grad():
-    inputs = prepare_sequence(training_data[0][0], word_to_ix)
+    inputs = prepare_sequence(training_data[1][0], word_to_ix)
     tag_scores = model(inputs)
 
     # The sentence is "the dog ate the apple".  i,j corresponds to score for tag j
