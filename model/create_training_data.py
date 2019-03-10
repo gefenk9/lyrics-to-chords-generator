@@ -1,4 +1,5 @@
 import os
+import random
 dir = r"C:\Users\gefenk\Documents\Deep Learning\chords_to_lyrics_generator\data\lyrics_chords"
 file = r"all-i-want-for-christmas-is-you"
 training_data = []
@@ -17,12 +18,37 @@ def prep_data():
     word_to_ix = {}
     tag_to_ix = {}
 
-    for sent, tags in training_data:
-        for word in sent.split():
-            if word not in word_to_ix:
-                word_to_ix[word] = len(word_to_ix)
-        for tag in tags.split():
-            if tag not in tag_to_ix:
-                tag_to_ix[tag] = len(tag_to_ix)
+    new_training_data = []
 
-    return word_to_ix, tag_to_ix
+    for sent, tags in training_data:
+        sent, tags = prep_tags(sent, tags)
+
+        new_training_data.append([sent, tags])
+        for w in sent:
+            if w not in word_to_ix:
+                word_to_ix[w] = len(word_to_ix)
+
+        for t in tags:
+            if t not in tag_to_ix:
+                tag_to_ix[t] = len(tag_to_ix)
+
+    return word_to_ix, tag_to_ix, new_training_data
+
+def prep_tags(sent, chords_tags):
+    sent_splitted = sent.strip().split(" ")
+    chords_tags_splitted = chords_tags.strip().split(" ")
+    copied_tags = chords_tags_splitted.copy()
+    while len(sent_splitted) > len(chords_tags_splitted):
+        chords_tags_splitted.insert(chords_tags_splitted.index(copied_tags[0]), copied_tags[0])
+        random.shuffle(copied_tags)
+    dense_tags = chords_tags_splitted.copy()
+    i = 0
+    while len(sent_splitted) < len(dense_tags):
+        new_chord = ""
+        new_chord = " ".join(dense_tags[i:i+2])
+        dense_tags = dense_tags[i+2:]
+        dense_tags.insert(0, new_chord)
+
+
+
+    return sent_splitted, dense_tags
