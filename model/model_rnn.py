@@ -68,7 +68,8 @@ optimizer = optim.SGD(model.parameters(), lr=0.1)
 with torch.no_grad():
     inputs = prepare_sequence(training_data[1][0], word_to_ix)
     tag_scores = model(inputs)
-    print(tag_scores)
+    results = vectors_to_tags(tag_scores, tag_to_ix)
+    print(results)
 
 for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
     for sentence, tags in training_data:
