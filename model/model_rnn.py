@@ -13,7 +13,7 @@ def prepare_sequence(seq, to_ix):
 def vectors_to_tags(out_vectors, tags_to_ix):
     results = []
     for vec in out_vectors:
-        out_ix = vec[max(vec)]
+        out_ix = (vec==max(vec)).nonzero()[0]
         for tag in tags_to_ix:
             if tags_to_ix[tag] == out_ix:
                 results.append(tag)
