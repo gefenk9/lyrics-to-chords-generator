@@ -10,6 +10,18 @@ def prepare_sequence(seq, to_ix):
     idxs = [to_ix[w] for w in seq]
     return torch.tensor(idxs, dtype=torch.long)
 
+def vectors_to_tags(out_vectors, tags_to_ix):
+    results = []
+    for vec in out_vectors:
+        out_ix = vec[max(vec)]
+        for tag in tags_to_ix:
+            if tags_to_ix[tag] == out_ix:
+                results.append(tag)
+                break
+    return results
+
+
+
 class LSTMTagger(nn.Module):
 
     def __init__(self, embedding_dim, hidden_dim, vocab_size, tagset_size):
@@ -86,11 +98,5 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
 with torch.no_grad():
     inputs = prepare_sequence(training_data[1][0], word_to_ix)
     tag_scores = model(inputs)
-
-    # The sentence is "the dog ate the apple".  i,j corresponds to score for tag j
-    # for word i. The predicted tag is the maximum scoring tag.
-    # Here, we can see the predicted sequence below is 0 1 2 0 1
-    # since 0 is index of the maximum value of row 1,
-    # 1 is the index of maximum value of row 2, etc.
-    # Which is DET NOUN VERB DET NOUN, the correct sequence!
-    print(tag_scores)
+    results = vectors_to_tags(tag_scores, tag_to_ix)
+    print (results)
