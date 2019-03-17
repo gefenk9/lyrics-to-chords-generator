@@ -100,4 +100,4 @@ with torch.no_grad():
     inputs = prepare_sequence(training_data[1][0], word_to_ix)
     tag_scores = model(inputs)
     results = vectors_to_tags(tag_scores, tag_to_ix)
-    print (results)
+    print(results)
