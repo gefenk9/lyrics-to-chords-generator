@@ -1,64 +1,75 @@
 import os
+import pickle
 import random
 dir = r"C:\Users\gefenk\Documents\Deep Learning\chords_to_lyrics_generator\data\lyrics_chords"
 
 ready_songs = []
 
+def is_ok(sent, tags):
+    if len(sent) == 0:
+        return True
+    if '<' in sent or '|' in sent:
+        return False
+    has_good_chords = False
+    for tag in tags:
+        if tag is not '' or tag is not ' ':
+            if all(ord(c) < 128 for c in tag):
+                has_good_chords = True
+            else:
+                return False
+    return has_good_chords
+
 def prep_data():
     word_to_ix = {}
     tag_to_ix = {}
     new_training_data = []
+    nums = 0
     for file_name in os.listdir(dir):
-        file = file_name.split('.')[0]
-        training_data = []
-        with open(os.path.join(dir, file+".lyrics")) as f:
-            for index, line in enumerate(f.readlines()):
-                new_tup = ["", ""]
-                new_tup[0] = line
-                training_data.append(new_tup)
+        try:
+            if nums < 100:
+                file = file_name.split('.')[0]
+                training_data = []
+                with open(os.path.join(dir, file+".df"), "rb+") as f:
+                    training_data = pickle.load(f)
 
-        with open(os.path.join(dir, file + ".chords")) as f:
-            for index, line in enumerate(f.readlines()):
-                try:
-                    if index >= len(training_data):
-                        training_data.append(["", line])
-                except Exception as e:
-                    #TODO
-                    pass
+                for sent_tag in training_data:
+                    if sent_tag[0] is None or sent_tag[1] is None:
+                        continue
+                    sent, tags = prep_tags(sent_tag)
+                    if not is_ok(sent, tags):
+                        continue
+                    print (sent, tags)
+                    new_training_data.append([sent, tags])
+                    for w in sent:
+                        if w not in word_to_ix:
+                            word_to_ix[w] = len(word_to_ix)
 
+                    for t in tags:
+                        if t not in tag_to_ix:
+                            tag_to_ix[t] = len(tag_to_ix)
 
+                nums+=1
+            else:
+                break
+        except Exception as e:
+            print(e)
 
-        for sent, tags in training_data:
-            sent, tags = prep_tags(sent, tags)
-
-            new_training_data.append([sent, tags])
-            for w in sent:
-                if w not in word_to_ix:
-                    word_to_ix[w] = len(word_to_ix)
-
-            for t in tags:
-                if t not in tag_to_ix:
-                    tag_to_ix[t] = len(tag_to_ix)
 
     return word_to_ix, tag_to_ix, new_training_data
 
 
 
-def prep_tags(sent, chords_tags):
-    sent_splitted = sent.strip().split(" ")
-    chords_tags_splitted = chords_tags.strip().split(" ")
-    copied_tags = chords_tags_splitted.copy()
-    while len(sent_splitted) > len(chords_tags_splitted):
-        chords_tags_splitted.insert(chords_tags_splitted.index(copied_tags[0]), copied_tags[0])
-        random.shuffle(copied_tags)
-    dense_tags = chords_tags_splitted.copy()
-    i = 0
-    while len(sent_splitted) < len(dense_tags):
-        new_chord = ""
-        new_chord = " ".join(dense_tags[i:i+2])
-        dense_tags = dense_tags[i+2:]
-        dense_tags.insert(0, new_chord)
-
-
-
-    return sent_splitted, dense_tags
+def prep_tags(sent_chords):
+    if sent_chords[0].strip() == '' and sent_chords[1].strip() == '':
+        return [''], ['']
+    sent_splitted = sent_chords[0].strip().split(" ")
+    chords_tags_splitted = list(sent_chords[1].strip())
+    while len(sent_splitted) != len(chords_tags_splitted):
+        if len(chords_tags_splitted) > len(sent_splitted):
+            if ' ' in chords_tags_splitted:
+                chords_tags_splitted.remove(' ')
+            else:
+                chords_tags_splitted = chords_tags_splitted[:-1]
+        else:
+            chords_tags_splitted.append(chords_tags_splitted[-1])
+    return sent_splitted, chords_tags_splitted
