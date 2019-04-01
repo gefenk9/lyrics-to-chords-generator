@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
-
+import random
 from model.create_training_data import prep_data
 torch.manual_seed(1)
 
@@ -56,6 +56,9 @@ class LSTMTagger(nn.Module):
 
 
 word_to_ix, tag_to_ix, training_data = prep_data()
+random.shuffle(training_data)
+test = training_data[int(0.85*(len(training_data))):]
+training_data = training_data[:int(0.85*(len(training_data)))]
 EMBEDDING_DIM=6
 HIDDEN_DIM=6
 model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
@@ -66,12 +69,14 @@ optimizer = optim.SGD(model.parameters(), lr=0.1)
 # Note that element i,j of the output is the score for tag j for word i.
 # Here we don't need to train, so the code is wrapped in torch.no_grad()
 with torch.no_grad():
-    inputs = prepare_sequence(training_data[1][0], word_to_ix)
+    print (test[1][0])
+    inputs = prepare_sequence(test[1][0], word_to_ix)
     tag_scores = model(inputs)
     results = vectors_to_tags(tag_scores, tag_to_ix)
     print(results)
 
-for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is toy data
+for epoch in range(300):# again, normally you would NOT do 300 epochs, it is toy data
+    print("{} %".format(epoch*100.0/300.0))
     for sentence, tags in training_data:
         # Step 1. Remember that Pytorch accumulates gradients.
         # We need to clear them out before each instance
@@ -97,7 +102,10 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
 
 # See what the scores are after training
 with torch.no_grad():
-    inputs = prepare_sequence(training_data[1][0], word_to_ix)
+    #example = "I need you baby one more time".split(" ")
+    inputs = prepare_sequence(test[1][0], word_to_ix)
     tag_scores = model(inputs)
     results = vectors_to_tags(tag_scores, tag_to_ix)
+
     print(results)
+    print(test[1][1])
