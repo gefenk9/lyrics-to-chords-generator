@@ -21,7 +21,6 @@ def vectors_to_tags(out_vectors, tags_to_ix):
     return results
 
 
-
 class LSTMTagger(nn.Module):
 
     def __init__(self, embedding_dim, hidden_dim, vocab_size, tagset_size):
@@ -65,47 +64,51 @@ model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
 loss_function = nn.NLLLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1)
 
-# See what the scores are before training
-# Note that element i,j of the output is the score for tag j for word i.
-# Here we don't need to train, so the code is wrapped in torch.no_grad()
-with torch.no_grad():
-    print (test[1][0])
-    inputs = prepare_sequence(test[1][0], word_to_ix)
-    tag_scores = model(inputs)
-    results = vectors_to_tags(tag_scores, tag_to_ix)
-    print(results)
 
-for epoch in range(300):# again, normally you would NOT do 300 epochs, it is toy data
-    print("{} %".format(epoch*100.0/300.0))
+num_of_epochs = 500
+for epoch in range(num_of_epochs):# again, normally you would NOT do 300 epochs, it is toy data
+    gen_loss = 0
     for sentence, tags in training_data:
-        # Step 1. Remember that Pytorch accumulates gradients.
-        # We need to clear them out before each instance
-        model.zero_grad()
+        try:
+            # Step 1. Remember that Pytorch accumulates gradients.
+            # We need to clear them out before each instance
+            model.zero_grad()
 
-        # Also, we need to clear out the hidden state of the LSTM,
-        # detaching it from its history on the last instance.
-        model.hidden = model.init_hidden()
+            # Also, we need to clear out the hidden state of the LSTM,
+            # detaching it from its history on the last instance.
+            model.hidden = model.init_hidden()
 
-        # Step 2. Get our inputs ready for the network, that is, turn them into
-        # Tensors of word indices.
-        sentence_in = prepare_sequence(sentence, word_to_ix)
-        targets = prepare_sequence(tags, tag_to_ix)
+            # Step 2. Get our inputs ready for the network, that is, turn them into
+            # Tensors of word indices.
+            sentence_in = prepare_sequence(sentence, word_to_ix)
+            targets = prepare_sequence(tags, tag_to_ix)
 
-        # Step 3. Run our forward pass.
-        tag_scores = model(sentence_in)
+            # Step 3. Run our forward pass.
+            tag_scores = model(sentence_in)
 
-        # Step 4. Compute the loss, gradients, and update the parameters by
-        #  calling optimizer.step()
-        loss = loss_function(tag_scores, targets)
-        loss.backward()
-        optimizer.step()
+            # Step 4. Compute the loss, gradients, and update the parameters by
+            #  calling optimizer.step()
+            loss = loss_function(tag_scores, targets)
+
+            gen_loss += loss.data
+            loss.backward()
+            optimizer.step()
+
+        except Exception as e:
+            print(e)
+    print("finished {} % loss is  {}".format(epoch * 100.0 / num_of_epochs, loss / float(len(training_data))))
 
 # See what the scores are after training
 with torch.no_grad():
-    #example = "I need you baby one more time".split(" ")
-    inputs = prepare_sequence(test[1][0], word_to_ix)
-    tag_scores = model(inputs)
-    results = vectors_to_tags(tag_scores, tag_to_ix)
+    suc = 0
+    for test_sent in test:
+        inputs = prepare_sequence(test_sent[0], word_to_ix)
+        tag_scores = model(inputs)
+        results = vectors_to_tags(tag_scores, tag_to_ix)
+        if tag_scores == results:
+            suc += 1
 
-    print(results)
-    print(test[1][1])
+        print("The sent: {}".format(test_sent[0]))
+        print("What the model predict: {}".format(results))
+        print("The true result: {}".format(test_sent[1]))
+    print (suc/float(len(test)))
