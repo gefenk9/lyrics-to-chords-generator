@@ -77,10 +77,10 @@ EMBEDDING_DIM=16
 HIDDEN_DIM=32
 model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
 loss_function = nn.NLLLoss()
-optimizer = optim.SGD(model.parameters(), lr=0.1)
+optimizer = optim.SGD(model.parameters(), lr=1e-3)
 
 
-num_of_epochs = 20
+num_of_epochs = 1500
 train_errors_per_epoch= []
 test_errors_per_epoch= []
 for epoch in range(num_of_epochs):# again, normally you would NOT do 300 epochs, it is toy data
@@ -117,17 +117,16 @@ for epoch in range(num_of_epochs):# again, normally you would NOT do 300 epochs,
     test_err = check_error(test, model, word_to_ix, tag_to_ix, loss_function)
     train_errors_per_epoch.append(trainging_err)
     test_errors_per_epoch.append(test_err)
-    print("finished {} % loss is  {} train err {} test err {}".format(epoch * 100.0 / num_of_epochs, loss / float(len(training_data)),trainging_err ,test_err ))
+    print("finished {} % loss is  {} train err {} test err {}".format(epoch * 100.0 / num_of_epochs, gen_loss / float(len(training_data)),trainging_err ,test_err ))
 
 print ("plotting")
 xs = range(len(train_errors_per_epoch))
 ys = train_errors_per_epoch
-plt.plot(xs, ys, color="blue", label="train error")
-#plt.savefig('train_error_curve')
+plt.plot(xs, ys, color="blue", label="train loss")
 xs = range(len(test_errors_per_epoch))
 ys = test_errors_per_epoch
-plt.plot(xs, ys, color="red", label="test error")
-plt.savefig('error_curve')
+plt.plot(xs, ys, color="red", label="test loss")
+plt.savefig('loss_curve')
 
 # See what the scores are after training
 with torch.no_grad():
