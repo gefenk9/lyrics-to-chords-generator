@@ -4,6 +4,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 import random
 from model.create_training_data import prep_data
+import matplotlib.pyplot as plt
 torch.manual_seed(1)
 
 def prepare_sequence(seq, to_ix):
@@ -20,6 +21,20 @@ def vectors_to_tags(out_vectors, tags_to_ix):
                 break
     return results
 
+def check_error(data_set , model, word_to_ix, tag_to_ix, loss_function):
+    sum_loss = 0
+    for sentence, tags in data_set:
+        sentence_in = prepare_sequence(sentence, word_to_ix)
+        targets = prepare_sequence(tags, tag_to_ix)
+
+        # Step 3. Run our forward pass.
+        tag_scores = model(sentence_in)
+
+        # Step 4. Compute the loss, gradients, and update the parameters by
+        #  calling optimizer.step()
+        loss = loss_function(tag_scores, targets)
+        sum_loss += loss
+    return (float(sum_loss) / float(len(data_set)))
 
 class LSTMTagger(nn.Module):
 
@@ -58,14 +73,16 @@ word_to_ix, tag_to_ix, training_data = prep_data()
 random.shuffle(training_data)
 test = training_data[int(0.85*(len(training_data))):]
 training_data = training_data[:int(0.85*(len(training_data)))]
-EMBEDDING_DIM=6
-HIDDEN_DIM=6
+EMBEDDING_DIM=16
+HIDDEN_DIM=32
 model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
 loss_function = nn.NLLLoss()
 optimizer = optim.SGD(model.parameters(), lr=0.1)
 
 
-num_of_epochs = 500
+num_of_epochs = 20
+train_errors_per_epoch= []
+test_errors_per_epoch= []
 for epoch in range(num_of_epochs):# again, normally you would NOT do 300 epochs, it is toy data
     gen_loss = 0
     for sentence, tags in training_data:
@@ -93,10 +110,24 @@ for epoch in range(num_of_epochs):# again, normally you would NOT do 300 epochs,
             gen_loss += loss.data
             loss.backward()
             optimizer.step()
-
         except Exception as e:
             print(e)
-    print("finished {} % loss is  {}".format(epoch * 100.0 / num_of_epochs, loss / float(len(training_data))))
+
+    trainging_err = check_error(training_data, model, word_to_ix, tag_to_ix, loss_function)
+    test_err = check_error(test, model, word_to_ix, tag_to_ix, loss_function)
+    train_errors_per_epoch.append(trainging_err)
+    test_errors_per_epoch.append(test_err)
+    print("finished {} % loss is  {} train err {} test err {}".format(epoch * 100.0 / num_of_epochs, loss / float(len(training_data)),trainging_err ,test_err ))
+
+print ("plotting")
+xs = range(len(train_errors_per_epoch))
+ys = train_errors_per_epoch
+plt.plot(xs, ys, color="blue", label="train error")
+#plt.savefig('train_error_curve')
+xs = range(len(test_errors_per_epoch))
+ys = test_errors_per_epoch
+plt.plot(xs, ys, color="red", label="test error")
+plt.savefig('error_curve')
 
 # See what the scores are after training
 with torch.no_grad():
@@ -104,11 +135,12 @@ with torch.no_grad():
     for test_sent in test:
         inputs = prepare_sequence(test_sent[0], word_to_ix)
         tag_scores = model(inputs)
-        results = vectors_to_tags(tag_scores, tag_to_ix)
-        if tag_scores == results:
+        true_result = test_sent[1]
+        predicted_results = vectors_to_tags(tag_scores, tag_to_ix)
+        if true_result == predicted_results:
             suc += 1
 
         print("The sent: {}".format(test_sent[0]))
-        print("What the model predict: {}".format(results))
-        print("The true result: {}".format(test_sent[1]))
-    print (suc/float(len(test)))
+        print("What the model predict: {}".format(predicted_results))
+        print("The true result: {}".format(true_result))
+    print (suc,float(len(test)))
