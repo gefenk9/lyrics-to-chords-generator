@@ -4,7 +4,7 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/icons.0ab54153.woff2"
   },
   {
-    "revision": "70656dde68b90ddc9923",
+    "revision": "c9610dff5fd3a3df3226",
     "url": "/lyrics-to-chords-generator/static/css/main.06ed8def.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/brand-icons.a1a749e8.svg"
   },
   {
-    "revision": "8d41a47d1aa0883ae10b",
-    "url": "/lyrics-to-chords-generator/static/js/2.2679762d.chunk.js"
+    "revision": "746fd46654ce7d22f339",
+    "url": "/lyrics-to-chords-generator/static/js/2.5b3cee12.chunk.js"
   },
   {
     "revision": "b7e463857172d7262dc093c00d8f68aa",
@@ -44,8 +44,8 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/outline-icons.ad97afd3.ttf"
   },
   {
-    "revision": "70656dde68b90ddc9923",
-    "url": "/lyrics-to-chords-generator/static/js/main.f2335663.chunk.js"
+    "revision": "c9610dff5fd3a3df3226",
+    "url": "/lyrics-to-chords-generator/static/js/main.067d27fb.chunk.js"
   },
   {
     "revision": "faff92145777a3cbaf8e7367b4807987",
@@ -84,11 +84,11 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/icons.962a1bf3.svg"
   },
   {
-    "revision": "8d41a47d1aa0883ae10b",
+    "revision": "746fd46654ce7d22f339",
     "url": "/lyrics-to-chords-generator/static/css/2.3f92e7dc.chunk.css"
   },
   {
-    "revision": "6e09d698771f1ca5331af6fb040eef21",
+    "revision": "20892a5dde273999867197334785393f",
     "url": "/lyrics-to-chords-generator/index.html"
   }
 ];
