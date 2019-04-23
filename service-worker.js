@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/chords_to_lyrics_generator/precache-manifest.d4bc30ab26bd3136416ace18b262d169.js"
+  "/lyrics-to-chords-generator/precache-manifest.80cd5c2258aeb8731fc7dce8e8161bf5.js"
 );
 
 workbox.clientsClaim();
@@ -28,7 +28,7 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.suppressWarnings();
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
-workbox.routing.registerNavigationRoute("/chords_to_lyrics_generator/index.html", {
+workbox.routing.registerNavigationRoute("/lyrics-to-chords-generator/index.html", {
   
   blacklist: [/^\/_/,/\/[^\/]+\.[^\/]+$/],
 });
