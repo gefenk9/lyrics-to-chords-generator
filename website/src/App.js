@@ -31,6 +31,7 @@ class App extends Component {
         <a
           href="https://github.com/gefenk9"
           target="_blank"
+          rel="noopener noreferrer"
           style={{ color: "black" }}
         >
           <Icon name="github" />
