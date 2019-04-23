@@ -4,7 +4,7 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/icons.0ab54153.woff2"
   },
   {
-    "revision": "c9610dff5fd3a3df3226",
+    "revision": "6d417a7e047c66022977",
     "url": "/lyrics-to-chords-generator/static/css/main.06ed8def.chunk.css"
   },
   {
@@ -44,8 +44,8 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/outline-icons.ad97afd3.ttf"
   },
   {
-    "revision": "c9610dff5fd3a3df3226",
-    "url": "/lyrics-to-chords-generator/static/js/main.067d27fb.chunk.js"
+    "revision": "6d417a7e047c66022977",
+    "url": "/lyrics-to-chords-generator/static/js/main.3d9e3462.chunk.js"
   },
   {
     "revision": "faff92145777a3cbaf8e7367b4807987",
@@ -88,7 +88,7 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/css/2.3f92e7dc.chunk.css"
   },
   {
-    "revision": "20892a5dde273999867197334785393f",
+    "revision": "f4fbeca668cece99ecaa288aa12d45fa",
     "url": "/lyrics-to-chords-generator/index.html"
   }
 ];
