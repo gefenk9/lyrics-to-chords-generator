@@ -6,6 +6,8 @@ Generate chords to a given lyrics using LSTM
 
 ## How to train
 
+## How to save & load the trained model
+
 ## How to run the server
 
 On port 8080:
