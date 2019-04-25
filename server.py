@@ -16,13 +16,12 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
                 lyrics = self.getLyrics()
 
                 # TODO: get chords from model
-                mock_answer = {"chords":["A","B","D"]}
+                answer = {"chords":["A","B","D"]}
 
                 self.send_response(200)
                 self.end_headers()
 
-                # TODO: return chords as json 
-                self.wfile.write(bytes(json.dumps(mock_answer), "utf8")) 
+                self.wfile.write(bytes(json.dumps(answer), "utf8")) 
             except:
                 self.send_response(400)
                 self.end_headers()
