@@ -33,7 +33,7 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(bytes("Only HTTP POST to path /to_chords is allowd.","utf8"))
  
-print("starting server...")
+print("starting server...  ")
 httpd = HTTPServer(("0.0.0.0", int(sys.argv[1])), LyricsChordsServer)
 httpd.serve_forever()
  
