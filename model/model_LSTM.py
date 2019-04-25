@@ -19,6 +19,9 @@ HIDDEN_LAYERS =3 #TRYING
 LEARNING_RATE = 1e-3
 
 def prepare_sequence(seq, to_ix):
+    for index, w in enumerate(seq):
+        if w not in to_ix:
+            seq[index] = ''
     idxs = [to_ix[w] for w in seq]
     return torch.tensor(idxs, dtype=torch.long)
 
@@ -90,7 +93,7 @@ def main():
     optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
 
 
-    num_of_epochs = 300
+    num_of_epochs = 500
     train_errors_per_epoch= []
     test_errors_per_epoch= []
     for epoch in range(num_of_epochs):
@@ -165,8 +168,10 @@ def main():
         print(suc, float(len(test)))
 
     torch.save(model, './../model_versions/model_details_'+time.strftime("%Y%m%d_%H%M%S"))
-    pickle.dump(word_to_ix, 'word_to_ix')
-    pickle.dump(tag_to_ix, 'tag_to_ix')
+    with open('word_to_ix', 'wb') as pickle_file:
+        pickle.dump(word_to_ix, pickle_file)
+    with open('tag_to_ix', 'wb') as pickle_file:
+        pickle.dump(tag_to_ix, pickle_file)
 
 def load_existing_model():
     list_of_files = glob.glob('./../model_versions/model_details_*')
@@ -175,9 +180,13 @@ def load_existing_model():
     return model
 
 def get_chords(lyrics):
-    model = load_existing_model
-    word_to_ix = pickle.load('word_to_ix')
-    tag_to_ix = pickle.load('tag_to_ix')
+    model = load_existing_model()
+    with open('word_to_ix', 'rb') as pickle_file:
+        word_to_ix = pickle.load(pickle_file)
+
+    with open('tag_to_ix', 'rb') as pickle_file:
+        tag_to_ix = pickle.load(pickle_file)
+
     chords = []
     for sent in lyrics:
         inputs = prepare_sequence(sent, word_to_ix)
@@ -189,4 +198,5 @@ def get_chords(lyrics):
 
 if __name__ == '__main__':
     main()
+    #get_chords([['hey','there', 'beautiful', 'girl'],['youre', 'so' ,'beautiful']])
 
