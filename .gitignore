@@ -104,6 +104,11 @@ venv.bak/
 .mypy_cache/
 
 
+
 data
 .idea
 model/*png
+
+htmls
+pre
+.vscode
