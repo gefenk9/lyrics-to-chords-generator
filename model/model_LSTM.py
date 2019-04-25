@@ -93,7 +93,7 @@ def main():
     optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
 
 
-    num_of_epochs = 500
+    num_of_epochs = 1000
     train_errors_per_epoch= []
     test_errors_per_epoch= []
     for epoch in range(num_of_epochs):

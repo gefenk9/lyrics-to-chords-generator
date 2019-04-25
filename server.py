@@ -5,7 +5,7 @@ import sys
 import os
 import json
 
-from model import model_LSTM
+from model.model_LSTM import get_chords
 
 website_dir = os.path.join(os.path.dirname(__file__), 'website','build')
 
@@ -19,8 +19,7 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
         if self.path == "/to_chords":
             try:
                 lyrics = self.getLyrics()
-
-                # TODO: get chords from model
+                get_chords(lyrics)
                 answer = {"chords":["A","B","D"]}
 
                 self.send_response(200)
