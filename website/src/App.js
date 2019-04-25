@@ -22,7 +22,7 @@ class App extends Component {
   render() {
     let chords;
     if (this.state.chords) {
-      chords = <pre>{JSON.stringify(chords, null, 4)}</pre>;
+      chords = <pre>{JSON.stringify(this.state.chords, null, 4)}</pre>;
     }
 
     return (
@@ -55,8 +55,8 @@ class App extends Component {
               Submit
             </Button>
           </Form>
+          {chords}
         </header>
-        {chords}
         {this.getFooter()}
       </div>
     );
@@ -67,22 +67,29 @@ class App extends Component {
 
     let apiUrl =
       "http://ec2-34-245-176-135.eu-west-1.compute.amazonaws.com/to_chords";
-    // if (window.location.hostname === "localhost") {
-    //   apiUrl = `http://${window.location.host}/to_chords`;
-    // }
+    if (window.location.hostname === "localhost") {
+      apiUrl = `http://${window.location.host}/to_chords`;
+    }
 
-    const resp = await fetch(apiUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        lyrics: this.state.inputLyrics
-      })
-    });
+    let resp;
+    try {
+      resp = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          lyrics: this.state.inputLyrics
+        })
+      });
+    } catch (e) {
+      this.setState({ loadingAPI: false });
+      return;
+    }
+
+    this.setState({ loadingAPI: false });
 
     if (!resp.ok) {
-      this.setState({ loadingAPI: false });
       return;
     }
 
