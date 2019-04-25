@@ -82,7 +82,7 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
  
 
 port = int(sys.argv[1])
-print("Starting server on http://localhost:{}/".format(port))
+print("Starting server on http://localhost:%d/" % port)
 httpd = HTTPServer(("0.0.0.0", port), LyricsChordsServer)
 httpd.serve_forever()
  
