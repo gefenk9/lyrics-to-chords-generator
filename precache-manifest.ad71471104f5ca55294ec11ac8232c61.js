@@ -88,7 +88,7 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/css/2.3f92e7dc.chunk.css"
   },
   {
-    "revision": "e2a7e9ecd64362baa3dd39e097839d90",
+    "revision": "d94ce271354b8e74259f69686329df00",
     "url": "/lyrics-to-chords-generator/index.html"
   }
 ];
