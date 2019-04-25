@@ -6,6 +6,9 @@ import random
 import time
 from model.create_training_data import prep_data
 import matplotlib.pyplot as plt
+import glob
+import os
+import pickle
 torch.manual_seed(1)
 
 #Hyper Parameters
@@ -74,87 +77,116 @@ class LSTMTagger(nn.Module):
         return tag_scores
 
 
-word_to_ix, tag_to_ix, data = prep_data()
-random.shuffle(data)
-test = data[:int(0.1*(len(data)))]
-training_data = data[int(0.1*(len(data))):]
+def main():
+    word_to_ix, tag_to_ix, data = prep_data()
+    random.shuffle(data)
+    test = data[:int(0.1*(len(data)))]
+    training_data = data[int(0.1*(len(data))):]
+    validation = training_data[:int(0.2*(len(data)))]
+    training_data = training_data[int(0.2*(len(data))):]
 
-model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix), HIDDEN_LAYERS)
-loss_function = nn.NLLLoss()
-optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
+    model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix), HIDDEN_LAYERS)
+    loss_function = nn.NLLLoss()
+    optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
 
 
-num_of_epochs = 500
-train_errors_per_epoch= []
-test_errors_per_epoch= []
-for epoch in range(num_of_epochs):
-    gen_loss = 0
-    for sentence, tags in training_data:
-        try:
-            # Step 1. Remember that Pytorch accumulates gradients.
-            # We need to clear them out before each instance
-            model.zero_grad()
+    num_of_epochs = 300
+    train_errors_per_epoch= []
+    test_errors_per_epoch= []
+    for epoch in range(num_of_epochs):
+        gen_loss = 0
+        for sentence, tags in training_data:
+            try:
+                # Remember that Pytorch accumulates gradients.
+                # We need to clear them out before each instance
+                model.zero_grad()
 
-            # Also, we need to clear out the hidden state of the LSTM,
-            # detaching it from its history on the last instance.
-            model.hidden = model.init_hidden()
+                # Also, we need to clear out the hidden state of the LSTM,
+                # detaching it from its history on the last instance.
+                model.hidden = model.init_hidden()
 
-            # Step 2. Get our inputs ready for the network, that is, turn them into
-            # Tensors of word indices.
-            sentence_in = prepare_sequence(sentence, word_to_ix)
-            targets = prepare_sequence(tags, tag_to_ix)
+                # Get our inputs ready for the network, that is, turn them into
+                # Tensors of word indices.
+                sentence_in = prepare_sequence(sentence, word_to_ix)
+                targets = prepare_sequence(tags, tag_to_ix)
 
-            # Step 3. Run our forward pass.
-            tag_scores = model(sentence_in)
+                # Run our forward pass.
+                tag_scores = model(sentence_in)
 
-            # Step 4. Compute the loss, gradients, and update the parameters by
-            #  calling optimizer.step()
-            loss = loss_function(tag_scores, targets)
+                # Compute the loss, gradients, and update the parameters by
+                #  calling optimizer.step()
+                loss = loss_function(tag_scores, targets)
 
-            gen_loss += loss.data
-            loss.backward(retain_graph=True)
-            optimizer.step()
-        except Exception as e:
-            print(e)
+                gen_loss += loss.data
+                loss.backward(retain_graph=True)
+                optimizer.step()
+            except Exception as e:
+                print(e)
 
-    trainging_err = check_error(training_data, model, word_to_ix, tag_to_ix, loss_function)
-    test_err = check_error(test, model, word_to_ix, tag_to_ix, loss_function)
-    train_errors_per_epoch.append(trainging_err)
-    test_errors_per_epoch.append(test_err)
-    print("finished {} % training loss is  {} train err {} test err {}".format(epoch * 100.0 / num_of_epochs, float(gen_loss )/ float(len(training_data)),trainging_err ,test_err ))
+        training_loss = check_error(training_data, model, word_to_ix, tag_to_ix, loss_function)
+        validation_loss = check_error(validation, model, word_to_ix, tag_to_ix, loss_function)
+        train_errors_per_epoch.append(training_loss)
+        test_errors_per_epoch.append(validation_loss)
+        print("finished {} % training loss is  {} training loss {} "
+              "validation err {}".format(epoch * 100.0 / num_of_epochs, float(gen_loss) / float(len(training_data)), training_loss, validation_loss))
 
-print("plotting loss curve")
+    print("plotting loss curve")
 
-xs = range(len(train_errors_per_epoch))
-ys = train_errors_per_epoch
-plt.plot(xs, ys, color="blue", label="train loss")
+    xs = range(len(train_errors_per_epoch))
+    ys = train_errors_per_epoch
+    plt.plot(xs, ys, color="blue", label="train loss")
 
-xs = range(len(test_errors_per_epoch))
-ys = test_errors_per_epoch
-plt.plot(xs, ys, color="red", label="test loss")
+    xs = range(len(test_errors_per_epoch))
+    ys = test_errors_per_epoch
+    plt.plot(xs, ys, color="red", label="test loss")
 
-plt.legend(loc='upper right', shadow=True)
-plt.xlabel('epochs')
-plt.ylabel('loss')
-plt.title('Loss Curve')
+    plt.legend(loc='upper right', shadow=True)
+    plt.xlabel('epochs')
+    plt.ylabel('loss')
+    plt.title('Loss Curve')
 
-plt.savefig('loss_curve_'+time.strftime("%Y%m%d_%H%M%S")+"_hid_layers"+HIDDEN_LAYERS+"_EMBEDDIM"+
-            EMBEDDING_DIM+"_HIDDIM"+HIDDEN_DIM)
+    plt.savefig('loss_curve_'+time.strftime("%Y%m%d_%H%M%S")+"_hid_layers"+str(HIDDEN_LAYERS)+"_EMBEDDIM"+
+                str(EMBEDDING_DIM)+"_HIDDIM"+str(HIDDEN_DIM))
 
-# See what the scores are after training
-with torch.no_grad():
-    suc = 0
-    for test_sent in test:
-        inputs = prepare_sequence(test_sent[0], word_to_ix)
+    # See what the scores are after training
+    with torch.no_grad():
+        suc = 0
+        for test_sent in test:
+            inputs = prepare_sequence(test_sent[0], word_to_ix)
+            tag_scores = model(inputs)
+            true_result = test_sent[1]
+            predicted_results = vectors_to_tags(tag_scores, tag_to_ix)
+            if true_result == predicted_results:
+                suc += 1
+
+            print("The sent: {}".format(test_sent[0]))
+            print("What the model predict: {}".format(predicted_results))
+            print("The true result: {}".format(true_result))
+        print(suc, float(len(test)))
+
+    torch.save(model, './../model_versions/model_details_'+time.strftime("%Y%m%d_%H%M%S"))
+    pickle.dump(word_to_ix, 'word_to_ix')
+    pickle.dump(tag_to_ix, 'tag_to_ix')
+
+def load_existing_model():
+    list_of_files = glob.glob('./../model_versions/model_details_*')
+    file = max(list_of_files , key = os.path.getctime)
+    model = torch.load(file)
+    return model
+
+def get_chords(lyrics):
+    model = load_existing_model
+    word_to_ix = pickle.load('word_to_ix')
+    tag_to_ix = pickle.load('tag_to_ix')
+    chords = []
+    for sent in lyrics:
+        inputs = prepare_sequence(sent, word_to_ix)
         tag_scores = model(inputs)
-        true_result = test_sent[1]
         predicted_results = vectors_to_tags(tag_scores, tag_to_ix)
-        if true_result == predicted_results:
-            suc += 1
+        chords.append(predicted_results)
+    return chords
+#load_existing_model()
 
-        print("The sent: {}".format(test_sent[0]))
-        print("What the model predict: {}".format(predicted_results))
-        print("The true result: {}".format(true_result))
-    print(suc, float(len(test)))
+if __name__ == '__main__':
+    main()
 
-torch.save(model, './../model_versions/model_details_'+time.strftime("%Y%m%d_%H%M%S"))

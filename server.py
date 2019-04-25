@@ -5,6 +5,8 @@ import sys
 import os
 import json
 
+from model import model_LSTM
+
 website_dir = os.path.join(os.path.dirname(__file__), 'website','build')
 
 class LyricsChordsServer(BaseHTTPRequestHandler):
