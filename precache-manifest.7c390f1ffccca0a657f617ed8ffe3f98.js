@@ -4,7 +4,7 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/icons.0ab54153.woff2"
   },
   {
-    "revision": "6d417a7e047c66022977",
+    "revision": "034ac9c2ee6b9e33d577",
     "url": "/lyrics-to-chords-generator/static/css/main.06ed8def.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/brand-icons.a1a749e8.svg"
   },
   {
-    "revision": "746fd46654ce7d22f339",
-    "url": "/lyrics-to-chords-generator/static/js/2.5b3cee12.chunk.js"
+    "revision": "d950a83aa1bc0edcb3ea",
+    "url": "/lyrics-to-chords-generator/static/js/2.4677bbc1.chunk.js"
   },
   {
     "revision": "b7e463857172d7262dc093c00d8f68aa",
@@ -44,8 +44,8 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/outline-icons.ad97afd3.ttf"
   },
   {
-    "revision": "6d417a7e047c66022977",
-    "url": "/lyrics-to-chords-generator/static/js/main.3d9e3462.chunk.js"
+    "revision": "034ac9c2ee6b9e33d577",
+    "url": "/lyrics-to-chords-generator/static/js/main.578dcdde.chunk.js"
   },
   {
     "revision": "faff92145777a3cbaf8e7367b4807987",
@@ -60,12 +60,12 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/brand-icons.a046592b.woff"
   },
   {
-    "revision": "8e3c7f5520f5ae906c6cf6d7f3ddcd19",
-    "url": "/lyrics-to-chords-generator/static/media/icons.8e3c7f55.eot"
-  },
-  {
     "revision": "b87b9ba532ace76ae9f6edfe9f72ded2",
     "url": "/lyrics-to-chords-generator/static/media/icons.b87b9ba5.ttf"
+  },
+  {
+    "revision": "8e3c7f5520f5ae906c6cf6d7f3ddcd19",
+    "url": "/lyrics-to-chords-generator/static/media/icons.8e3c7f55.eot"
   },
   {
     "revision": "13db00b7a34fee4d819ab7f9838cc428",
@@ -84,11 +84,11 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/icons.962a1bf3.svg"
   },
   {
-    "revision": "746fd46654ce7d22f339",
+    "revision": "d950a83aa1bc0edcb3ea",
     "url": "/lyrics-to-chords-generator/static/css/2.3f92e7dc.chunk.css"
   },
   {
-    "revision": "d94ce271354b8e74259f69686329df00",
+    "revision": "545eba11f0d4eb86a3201c32df1a973c",
     "url": "/lyrics-to-chords-generator/index.html"
   }
 ];
