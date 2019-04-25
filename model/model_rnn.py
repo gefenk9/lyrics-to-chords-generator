@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torch.optim as optim
 import random
+import time
 from model.create_training_data import prep_data
 import matplotlib.pyplot as plt
 torch.manual_seed(1)
@@ -38,15 +39,15 @@ def check_error(data_set , model, word_to_ix, tag_to_ix, loss_function):
 
 class LSTMTagger(nn.Module):
 
-    def __init__(self, embedding_dim, hidden_dim, vocab_size, tagset_size):
+    def __init__(self, embedding_dim, hidden_dim, vocab_size, tagset_size, hidden_layers):
         super(LSTMTagger, self).__init__()
         self.hidden_dim = hidden_dim
-
+        self.hidden_layers = hidden_layers
         self.word_embeddings = nn.Embedding(vocab_size, embedding_dim)
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim)
+        self.lstm = nn.LSTM(embedding_dim, hidden_dim, num_layers=self.hidden_layers)
 
         # The linear layer that maps from hidden state space to tag space
         self.hidden2tag = nn.Linear(hidden_dim, tagset_size)
@@ -57,30 +58,39 @@ class LSTMTagger(nn.Module):
         # Refer to the Pytorch documentation to see exactly
         # why they have this dimensionality.
         # The axes semantics are (num_layers, minibatch_size, hidden_dim)
-        return (torch.zeros(1, 1, self.hidden_dim),
-                torch.zeros(1, 1, self.hidden_dim))
+        return (torch.autograd.Variable(torch.zeros(self.hidden_layers, 1, self.hidden_dim)),
+                torch.autograd.Variable(torch.zeros(self.hidden_layers, 1, self.hidden_dim)))
+
+    def init_hidden2(self):
+        # Before we've done anything, we dont have any hidden state.SFF
+        # Refer to the Pytorch documentation to see exactly
+        # why they have this dimensionality.
+        # The axes semantics are (num_layers, minibatch_size, hidden_dim)
+        return (torch.autograd.Variable(torch.zeros(1, 1, self.hidden_dim)),
+                torch.autograd.Variable(torch.zeros(1, 1, self.hidden_dim)))
 
     def forward(self, sentence):
         embeds = self.word_embeddings(sentence)
-        lstm_out, self.hidden = self.lstm(
-            embeds.view(len(sentence), 1, -1), self.hidden)
+        lstm_out, self.hidden = self.lstm(embeds.view(len(sentence), 1, -1), self.hidden)
+
         tag_space = self.hidden2tag(lstm_out.view(len(sentence), -1))
         tag_scores = F.log_softmax(tag_space, dim=1)
         return tag_scores
 
 
-word_to_ix, tag_to_ix, training_data = prep_data()
-random.shuffle(training_data)
-test = training_data[int(0.85*(len(training_data))):]
-training_data = training_data[:int(0.85*(len(training_data)))]
-EMBEDDING_DIM=16
-HIDDEN_DIM=32
-model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
+word_to_ix, tag_to_ix, data = prep_data()
+random.shuffle(data)
+test = data[:int(0.1*(len(data)))]
+training_data = data[int(0.1*(len(data))):]
+EMBEDDING_DIM=7 #4th root of VOCAB size
+HIDDEN_DIM= 32# ?  between input and output size
+HIDDEN_LAYERS =3 #TRYING
+model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix), HIDDEN_LAYERS)
 loss_function = nn.NLLLoss()
 optimizer = optim.SGD(model.parameters(), lr=1e-3)
 
 
-num_of_epochs = 1500
+num_of_epochs = 500
 train_errors_per_epoch= []
 test_errors_per_epoch= []
 for epoch in range(num_of_epochs):# again, normally you would NOT do 300 epochs, it is toy data
@@ -108,7 +118,7 @@ for epoch in range(num_of_epochs):# again, normally you would NOT do 300 epochs,
             loss = loss_function(tag_scores, targets)
 
             gen_loss += loss.data
-            loss.backward()
+            loss.backward(retain_graph=True)
             optimizer.step()
         except Exception as e:
             print(e)
@@ -126,7 +136,15 @@ plt.plot(xs, ys, color="blue", label="train loss")
 xs = range(len(test_errors_per_epoch))
 ys = test_errors_per_epoch
 plt.plot(xs, ys, color="red", label="test loss")
-plt.savefig('loss_curve')
+
+plt.legend(
+           loc='upper right', shadow=True)
+plt.xlabel('epochs')
+plt.ylabel('loss')
+plt.title('Loss Curve')
+
+plt.savefig('loss_curve_'+time.strftime("%Y%m%d_%H%M%S")+"_hid_layers"+HIDDEN_LAYERS+"_EMBEDDIM"+
+            EMBEDDING_DIM+"_HIDDIM"+HIDDEN_DIM)
 
 # See what the scores are after training
 with torch.no_grad():
@@ -143,3 +161,5 @@ with torch.no_grad():
         print("What the model predict: {}".format(predicted_results))
         print("The true result: {}".format(true_result))
     print (suc,float(len(test)))
+
+torch.save(model, './../model_versions/model_details_'+time.strftime("%Y%m%d_%H%M%S"))
