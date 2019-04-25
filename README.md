@@ -25,5 +25,5 @@ HTTP/1.0 200 OK
 Server: BaseHTTP/0.6 Python/3.6.7
 Date: Thu, 25 Apr 2019 12:19:32 GMT
 
-{"chords": ["A", "B", "D"]}%
+{"chords": ["A", "B", "D"]}
 ```
