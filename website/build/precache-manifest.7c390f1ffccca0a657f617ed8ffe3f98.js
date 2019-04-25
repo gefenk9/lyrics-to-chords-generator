@@ -4,7 +4,7 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/icons.0ab54153.woff2"
   },
   {
-    "revision": "6d417a7e047c66022977",
+    "revision": "034ac9c2ee6b9e33d577",
     "url": "/lyrics-to-chords-generator/static/css/main.06ed8def.chunk.css"
   },
   {
@@ -16,8 +16,8 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/brand-icons.a1a749e8.svg"
   },
   {
-    "revision": "746fd46654ce7d22f339",
-    "url": "/lyrics-to-chords-generator/static/js/2.5b3cee12.chunk.js"
+    "revision": "d950a83aa1bc0edcb3ea",
+    "url": "/lyrics-to-chords-generator/static/js/2.4677bbc1.chunk.js"
   },
   {
     "revision": "b7e463857172d7262dc093c00d8f68aa",
@@ -28,12 +28,12 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/flags.9c74e172.png"
   },
   {
-    "revision": "ef60a4f6c25ef7f39f2d25a748dbecfe",
-    "url": "/lyrics-to-chords-generator/static/media/outline-icons.ef60a4f6.woff"
-  },
-  {
     "revision": "cd6c777f1945164224dee082abaea03a",
     "url": "/lyrics-to-chords-generator/static/media/outline-icons.cd6c777f.woff2"
+  },
+  {
+    "revision": "ef60a4f6c25ef7f39f2d25a748dbecfe",
+    "url": "/lyrics-to-chords-generator/static/media/outline-icons.ef60a4f6.woff"
   },
   {
     "revision": "701ae6abd4719e9c2ada3535a497b341",
@@ -44,8 +44,8 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/outline-icons.ad97afd3.ttf"
   },
   {
-    "revision": "6d417a7e047c66022977",
-    "url": "/lyrics-to-chords-generator/static/js/main.3d9e3462.chunk.js"
+    "revision": "034ac9c2ee6b9e33d577",
+    "url": "/lyrics-to-chords-generator/static/js/main.578dcdde.chunk.js"
   },
   {
     "revision": "faff92145777a3cbaf8e7367b4807987",
@@ -84,11 +84,11 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/icons.962a1bf3.svg"
   },
   {
-    "revision": "746fd46654ce7d22f339",
+    "revision": "d950a83aa1bc0edcb3ea",
     "url": "/lyrics-to-chords-generator/static/css/2.3f92e7dc.chunk.css"
   },
   {
-    "revision": "f4fbeca668cece99ecaa288aa12d45fa",
+    "revision": "545eba11f0d4eb86a3201c32df1a973c",
     "url": "/lyrics-to-chords-generator/index.html"
   }
 ];

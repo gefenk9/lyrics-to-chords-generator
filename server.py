@@ -37,7 +37,16 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(bytes("Only HTTP POST to path /to_chords is allowd.","utf8"))
 
-        #Handler for the GET requests
+    def do_OPTIONS(self):
+        self.send_response(200, "ok")
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header("Access-Control-Allow-Headers", "X-Requested-With")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.end_headers()
+
+    
+    #Handler for the GET requests
     def do_GET(self):
         if self.path=="/":
             self.path= "index.html"
