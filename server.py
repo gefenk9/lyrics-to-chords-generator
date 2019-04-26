@@ -13,23 +13,24 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
     def getLyrics(self):
         contentLength = int(self.headers["Content-Length"])
         postData = self.rfile.read(contentLength)
-        return json.loads(postData)["lyrics"]
+        return json.loads(postData.decode("utf-8"))["lyrics"]
 
     def do_POST(self):
         if self.path == "/to_chords":
             try:
                 lyrics = self.getLyrics()
-                get_chords(lyrics)
+                get_chords(lyrics) # This throws
                 answer = {"chords":["A","B","D"]}
 
                 self.send_response(200)
                 self.end_headers()
 
                 self.wfile.write(bytes(json.dumps(answer), "utf8")) 
-            except:
+            except Exception as e:
                 self.send_response(400)
                 self.end_headers()
-                self.wfile.write(bytes('Input data must be of type JSON: {"lyrics":"bla bla bla"}',"utf8"))
+                self.wfile.write(bytes('Input data must be of type JSON: {"lyrics":"bla bla bla"}\n',"utf8"))
+                self.wfile.write(bytes(str(e),"utf8"))
 
             return
         else:
