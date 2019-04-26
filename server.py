@@ -26,10 +26,11 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
                 self.end_headers()
 
                 self.wfile.write(bytes(json.dumps(answer), "utf8")) 
-            except:
+            except Exception as e:
                 self.send_response(400)
                 self.end_headers()
-                self.wfile.write(bytes('Input data must be of type JSON: {"lyrics":"bla bla bla"}',"utf8"))
+                self.wfile.write(bytes('Input data must be of type JSON: {"lyrics":"bla bla bla"}\n',"utf8"))
+                self.wfile.write(bytes(str(e),"utf8"))
 
             return
         else:
