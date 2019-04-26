@@ -13,10 +13,10 @@ torch.manual_seed(1)
 
 #Hyper Parameters
 
-EMBEDDING_DIM=7 #4th root of VOCAB size
-HIDDEN_DIM= 32# ?  between input and output size
-HIDDEN_LAYERS =3 #TRYING
-LEARNING_RATE = 1e-3
+EMBEDDING_DIM= 7 #4th root of VOCAB size
+HIDDEN_DIM = 32 # ?  between input and output size
+HIDDEN_LAYERS = 3 #TRYING
+LEARNING_RATE = 0.02#1e-3
 
 def prepare_sequence(seq, to_ix):
     for index, w in enumerate(seq):
@@ -93,7 +93,7 @@ def main():
     optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
 
 
-    num_of_epochs = 1000
+    num_of_epochs = 500
     train_errors_per_epoch= []
     test_errors_per_epoch= []
     for epoch in range(num_of_epochs):
