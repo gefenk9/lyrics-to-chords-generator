@@ -13,13 +13,13 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
     def getLyrics(self):
         contentLength = int(self.headers["Content-Length"])
         postData = self.rfile.read(contentLength)
-        return json.loads(postData)["lyrics"]
+        return json.loads(postData.decode("utf-8"))["lyrics"]
 
     def do_POST(self):
         if self.path == "/to_chords":
             try:
                 lyrics = self.getLyrics()
-                get_chords(lyrics)
+                get_chords(lyrics) # This throws
                 answer = {"chords":["A","B","D"]}
 
                 self.send_response(200)
