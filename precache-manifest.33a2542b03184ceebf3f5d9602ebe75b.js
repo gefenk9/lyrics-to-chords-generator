@@ -4,7 +4,7 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/icons.0ab54153.woff2"
   },
   {
-    "revision": "034ac9c2ee6b9e33d577",
+    "revision": "16f856b84d7bebf3e6f4",
     "url": "/lyrics-to-chords-generator/static/css/main.06ed8def.chunk.css"
   },
   {
@@ -44,8 +44,8 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/outline-icons.ad97afd3.ttf"
   },
   {
-    "revision": "034ac9c2ee6b9e33d577",
-    "url": "/lyrics-to-chords-generator/static/js/main.578dcdde.chunk.js"
+    "revision": "16f856b84d7bebf3e6f4",
+    "url": "/lyrics-to-chords-generator/static/js/main.70d024a7.chunk.js"
   },
   {
     "revision": "faff92145777a3cbaf8e7367b4807987",
@@ -60,16 +60,16 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/media/brand-icons.a046592b.woff"
   },
   {
-    "revision": "b87b9ba532ace76ae9f6edfe9f72ded2",
-    "url": "/lyrics-to-chords-generator/static/media/icons.b87b9ba5.ttf"
-  },
-  {
     "revision": "8e3c7f5520f5ae906c6cf6d7f3ddcd19",
     "url": "/lyrics-to-chords-generator/static/media/icons.8e3c7f55.eot"
   },
   {
     "revision": "13db00b7a34fee4d819ab7f9838cc428",
     "url": "/lyrics-to-chords-generator/static/media/brand-icons.13db00b7.eot"
+  },
+  {
+    "revision": "b87b9ba532ace76ae9f6edfe9f72ded2",
+    "url": "/lyrics-to-chords-generator/static/media/icons.b87b9ba5.ttf"
   },
   {
     "revision": "c5ebe0b32dc1b5cc449a76c4204d13bb",
@@ -88,7 +88,7 @@ self.__precacheManifest = [
     "url": "/lyrics-to-chords-generator/static/css/2.3f92e7dc.chunk.css"
   },
   {
-    "revision": "545eba11f0d4eb86a3201c32df1a973c",
+    "revision": "0ece250c38b7f5371efcaccfefe6a63b",
     "url": "/lyrics-to-chords-generator/index.html"
   }
 ];
