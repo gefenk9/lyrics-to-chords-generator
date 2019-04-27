@@ -203,17 +203,17 @@ def main():
         pickle.dump(tag_to_ix, pickle_file)
 
 def load_existing_model():
-    list_of_files = glob.glob('./../model_versions/model_details_*')
+    list_of_files = glob.glob('./model_versions/model_details_*')
     file = max(list_of_files , key = os.path.getctime)
     model = torch.load(file)
     return model
 
 def get_chords(lyrics):
     model = load_existing_model()
-    with open('word_to_ix', 'rb') as pickle_file:
+    with open('./model/word_to_ix', 'rb') as pickle_file:
         word_to_ix = pickle.load(pickle_file)
 
-    with open('tag_to_ix', 'rb') as pickle_file:
+    with open('./model/tag_to_ix', 'rb') as pickle_file:
         tag_to_ix = pickle.load(pickle_file)
 
     chords = []
