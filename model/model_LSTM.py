@@ -13,10 +13,10 @@ torch.manual_seed(1)
 
 #Hyper Parameters
 
-EMBEDDING_DIM= 7 #4th root of VOCAB size
-HIDDEN_DIM = 32 # ?  between input and output size
-HIDDEN_LAYERS = 3 #TRYING
-LEARNING_RATE = 0.02#1e-3
+EMBEDDING_DIM = 7#4th root of
+HIDDEN_DIM = 32
+HIDDEN_LAYERS = 3#TRYING
+LEARNING_RATE = 1e-3
 
 def prepare_sequence(seq, to_ix):
     for index, w in enumerate(seq):
@@ -35,7 +35,25 @@ def vectors_to_tags(out_vectors, tags_to_ix):
                 break
     return results
 
-def check_error(data_set , model, word_to_ix, tag_to_ix, loss_function):
+def check_error(data_set , model, word_to_ix, tag_to_ix, to_print=False):
+    errors = []
+    for sent_chords in data_set:
+        inputs = prepare_sequence(sent_chords[0], word_to_ix)
+        tag_scores = model(inputs)
+        true_result = sent_chords[1]
+        predicted_results = vectors_to_tags(tag_scores, tag_to_ix)
+        suc = 0
+        for index, chord in enumerate(true_result):
+            if chord == predicted_results[index]:
+                suc += 1
+        error_prec = float(suc) / float(len(true_result))
+        errors.append(error_prec)
+        if to_print:
+            print("The sent: {}".format(sent_chords[0]))
+            print("{} model predict: {} true result: {}".format(error_prec, predicted_results, true_result))
+    return 1 - float(sum(errors)) / float(len(errors))
+
+def check_loss(data_set, model, word_to_ix, tag_to_ix, loss_function):
     sum_loss = 0
     for sentence, tags in data_set:
         sentence_in = prepare_sequence(sentence, word_to_ix)
@@ -57,7 +75,7 @@ class LSTMTagger(nn.Module):
 
         # The LSTM takes word embeddings as inputs, and outputs hidden states
         # with dimensionality hidden_dim.
-        self.lstm = nn.LSTM(embedding_dim, hidden_dim, num_layers=self.hidden_layers)
+        self.lstm = nn.LSTM(embedding_dim, hidden_dim, num_layers=self.hidden_layers, dropout=0)
 
         # The linear layer that maps from hidden state space to tag space
         self.hidden2tag = nn.Linear(hidden_dim, tagset_size)
@@ -85,17 +103,19 @@ def main():
     random.shuffle(data)
     test = data[:int(0.1*(len(data)))]
     training_data = data[int(0.1*(len(data))):]
-    validation = training_data[:int(0.2*(len(data)))]
-    training_data = training_data[int(0.2*(len(data))):]
+    validation = training_data[:int(0.2*(len(training_data)))]
+    training_data = training_data[int(0.2*(len(training_data))):]
 
     model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix), HIDDEN_LAYERS)
     loss_function = nn.NLLLoss()
     optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
 
 
-    num_of_epochs = 500
-    train_errors_per_epoch= []
-    test_errors_per_epoch= []
+    num_of_epochs = 300
+    train_loss_per_epoch= []
+    validation_loss_per_epoch= []
+    test_err_per_epoch = []
+    train_err_per_epoch = []
     for epoch in range(num_of_epochs):
         gen_loss = 0
         for sentence, tags in training_data:
@@ -126,22 +146,29 @@ def main():
             except Exception as e:
                 print(e)
 
-        training_loss = check_error(training_data, model, word_to_ix, tag_to_ix, loss_function)
-        validation_loss = check_error(validation, model, word_to_ix, tag_to_ix, loss_function)
-        train_errors_per_epoch.append(training_loss)
-        test_errors_per_epoch.append(validation_loss)
+        training_loss = check_loss(training_data, model, word_to_ix, tag_to_ix, loss_function)
+        validation_loss = check_loss(validation, model, word_to_ix, tag_to_ix, loss_function)
+        test_err = check_error(test, model, word_to_ix, tag_to_ix)
+        train_err = check_error(training_data, model, word_to_ix, tag_to_ix)
+        train_loss_per_epoch.append(training_loss)
+        validation_loss_per_epoch.append(validation_loss)
+        train_err_per_epoch.append(train_err)
+        test_err_per_epoch.append(test_err)
         print("finished {} % training loss is  {} training loss {} "
-              "validation err {}".format(epoch * 100.0 / num_of_epochs, float(gen_loss) / float(len(training_data)), training_loss, validation_loss))
+              "validation loss {} test err {}".format(epoch * 100.0 / num_of_epochs,
+                                                      float(gen_loss) / float(len(training_data)),
+                                                      training_loss, validation_loss, test_err))
+    check_error(test, model, word_to_ix, tag_to_ix, True)
 
     print("plotting loss curve")
 
-    xs = range(len(train_errors_per_epoch))
-    ys = train_errors_per_epoch
+    xs = range(len(train_loss_per_epoch))
+    ys = train_loss_per_epoch
     plt.plot(xs, ys, color="blue", label="train loss")
 
-    xs = range(len(test_errors_per_epoch))
-    ys = test_errors_per_epoch
-    plt.plot(xs, ys, color="red", label="test loss")
+    xs = range(len(validation_loss_per_epoch))
+    ys = validation_loss_per_epoch
+    plt.plot(xs, ys, color="red", label="validation loss")
 
     plt.legend(loc='upper right', shadow=True)
     plt.xlabel('epochs')
@@ -151,21 +178,23 @@ def main():
     plt.savefig('loss_curve_'+time.strftime("%Y%m%d_%H%M%S")+"_hid_layers"+str(HIDDEN_LAYERS)+"_EMBEDDIM"+
                 str(EMBEDDING_DIM)+"_HIDDIM"+str(HIDDEN_DIM))
 
-    # See what the scores are after training
-    with torch.no_grad():
-        suc = 0
-        for test_sent in test:
-            inputs = prepare_sequence(test_sent[0], word_to_ix)
-            tag_scores = model(inputs)
-            true_result = test_sent[1]
-            predicted_results = vectors_to_tags(tag_scores, tag_to_ix)
-            if true_result == predicted_results:
-                suc += 1
+    plt.close()
+    xs = range(len(train_err_per_epoch))
+    ys = train_err_per_epoch
+    plt.plot(xs, ys, color="blue", label="train error")
 
-            print("The sent: {}".format(test_sent[0]))
-            print("What the model predict: {}".format(predicted_results))
-            print("The true result: {}".format(true_result))
-        print(suc, float(len(test)))
+    xs = range(len(test_err_per_epoch))
+    ys = test_err_per_epoch
+    plt.plot(xs, ys, color="red", label="test error")
+
+    plt.legend(loc='upper right', shadow=True)
+    plt.xlabel('epochs')
+    plt.ylabel('error')
+    plt.title('error Curve')
+
+    plt.savefig('error_curve_'+time.strftime("%Y%m%d_%H%M%S")+"_hid_layers"+str(HIDDEN_LAYERS)+"_EMBEDDIM"+
+                str(EMBEDDING_DIM)+"_HIDDIM"+str(HIDDEN_DIM))
+
 
     torch.save(model, './../model_versions/model_details_'+time.strftime("%Y%m%d_%H%M%S"))
     with open('word_to_ix', 'wb') as pickle_file:

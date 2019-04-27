@@ -19,7 +19,7 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
         if self.path == "/to_chords":
             try:
                 lyrics = self.getLyrics()
-                get_chords(lyrics) # This throws
+                chords = get_chords(lyrics) # This throws
                 answer = {"chords":["A","B","D"]}
 
                 self.send_response(200)
