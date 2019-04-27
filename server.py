@@ -23,10 +23,12 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
                 answer = {"chords":["A","B","D"]}
 
                 self.send_response(200)
+                self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
 
                 self.wfile.write(bytes(json.dumps(answer), "utf8")) 
             except Exception as e:
+                self.send_header('Access-Control-Allow-Origin', '*')
                 self.send_response(400)
                 self.end_headers()
                 self.wfile.write(bytes('Input data must be of type JSON: {"lyrics":"bla bla bla"}\n',"utf8"))
@@ -34,6 +36,7 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
 
             return
         else:
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.send_response(404)
             self.end_headers()
             self.wfile.write(bytes("Only HTTP POST to path /to_chords is allowd.","utf8"))
@@ -81,7 +84,8 @@ class LyricsChordsServer(BaseHTTPRequestHandler):
                 sendReply = True
 
             if sendReply == True:
-                with  open(final_path,"rb") as f:
+                with open(final_path,"rb") as f:
+                    self.send_header('Access-Control-Allow-Origin', '*')
                     self.send_response(200)
                     self.send_header('Content-type',mimetype)
                     self.end_headers()

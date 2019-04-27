@@ -67,7 +67,10 @@ class App extends Component {
 
     let apiUrl =
       "http://ec2-34-245-176-135.eu-west-1.compute.amazonaws.com/to_chords";
-    if (window.location.hostname === "localhost") {
+    if (
+      window.location.hostname === "localhost" &&
+      window.location.host != "localhost:3000"
+    ) {
       apiUrl = `http://${window.location.host}/to_chords`;
     }
 
