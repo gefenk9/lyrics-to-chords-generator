@@ -2,10 +2,14 @@
 
 Generate chords to a given lyrics using LSTM
 
+# Usage
+
 You can access to our official user friendly website 
 https://gefenk9.github.io/lyrics-to-chords-generator/
 
-# Usage
+You should allow mix content via your browser, because the website is served with https and the server answers with http
+
+[help here](https://pearsonnacommunity.force.com/support/s/article/How-to-display-mixed-content-with-Google-Chrome-Internet-Explorer-or-Firefox-1408394589290)
 
 ## How to train
 
