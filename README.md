@@ -2,6 +2,9 @@
 
 Generate chords to a given lyrics using LSTM
 
+You can access to our official user friendly website 
+https://gefenk9.github.io/lyrics-to-chords-generator/
+
 # Usage
 
 ## How to train
