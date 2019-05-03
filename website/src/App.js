@@ -69,7 +69,7 @@ class App extends Component {
     this.setState({ loadingAPI: true });
 
     let apiUrl =
-      "http://ec2-34-245-176-135.eu-west-1.compute.amazonaws.com/to_chords";
+      "https://wt-9ea9cc716197cc2580930513c1f0b64d-0.sandbox.auth0-extend.com/Lyrics2ChordsProxy";
     if (
       window.location.hostname === "localhost" &&
       window.location.host !== "localhost:3000"
