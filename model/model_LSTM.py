@@ -4,19 +4,20 @@ import torch.nn.functional as F
 import torch.optim as optim
 import random
 import time
-from model.create_training_data import prep_data
+from create_training_data import prep_data
+import matplotlib
 import matplotlib.pyplot as plt
 import glob
 import os
 import pickle
 torch.manual_seed(1)
-
+matplotlib.use('TkAgg')
 #Hyper Parameters
 
-EMBEDDING_DIM = 7#4th root of
-HIDDEN_DIM = 32
-HIDDEN_LAYERS = 3#TRYING
-LEARNING_RATE = 1e-3
+EMBEDDING_DIM = 32#4th root of
+HIDDEN_DIM = 64
+HIDDEN_LAYERS = 4#TRYING
+LEARNING_RATE = 0.01
 
 def prepare_sequence(seq, to_ix):
     for index, w in enumerate(seq):
@@ -38,6 +39,7 @@ def vectors_to_tags(out_vectors, tags_to_ix):
 def check_error(data_set , model, word_to_ix, tag_to_ix, to_print=False):
     errors = []
     for sent_chords in data_set:
+        model.zero_grad()
         inputs = prepare_sequence(sent_chords[0], word_to_ix)
         tag_scores = model(inputs)
         true_result = sent_chords[1]
@@ -62,7 +64,7 @@ def check_loss(data_set, model, word_to_ix, tag_to_ix, loss_function):
         tag_scores = model(sentence_in)
 
         loss = loss_function(tag_scores, targets)
-        sum_loss += loss
+        sum_loss += loss.data
     return (float(sum_loss) / float(len(data_set)))
 
 class LSTMTagger(nn.Module):
@@ -111,7 +113,7 @@ def main():
     optimizer = optim.SGD(model.parameters(), lr=LEARNING_RATE)
 
 
-    num_of_epochs = 300
+    num_of_epochs = 500
     train_loss_per_epoch= []
     validation_loss_per_epoch= []
     test_err_per_epoch = []
@@ -145,19 +147,24 @@ def main():
                 optimizer.step()
             except Exception as e:
                 print(e)
+        training_loss = float(gen_loss) / float(len(training_data))
+        print("finished {} % training loss is  {} ".format(epoch * 100.0 / num_of_epochs,
+                                                      training_loss))
 
-        training_loss = check_loss(training_data, model, word_to_ix, tag_to_ix, loss_function)
-        validation_loss = check_loss(validation, model, word_to_ix, tag_to_ix, loss_function)
-        test_err = check_error(test, model, word_to_ix, tag_to_ix)
-        train_err = check_error(training_data, model, word_to_ix, tag_to_ix)
-        train_loss_per_epoch.append(training_loss)
-        validation_loss_per_epoch.append(validation_loss)
-        train_err_per_epoch.append(train_err)
-        test_err_per_epoch.append(test_err)
-        print("finished {} % training loss is  {} training loss {} "
-              "validation loss {} test err {}".format(epoch * 100.0 / num_of_epochs,
-                                                      float(gen_loss) / float(len(training_data)),
-                                                      training_loss, validation_loss, test_err))
+        if epoch % 20 == 0:
+
+            #training_loss = check_loss(training_data, model, word_to_ix, tag_to_ix, loss_function)
+            validation_loss = check_loss(validation, model, word_to_ix, tag_to_ix, loss_function)
+            test_err = check_error(test, model, word_to_ix, tag_to_ix)
+            train_err = check_error(training_data, model, word_to_ix, tag_to_ix)
+            train_loss_per_epoch.append(training_loss)
+            validation_loss_per_epoch.append(validation_loss)
+            train_err_per_epoch.append(train_err)
+            test_err_per_epoch.append(test_err)
+            print("finished {} % training loss is  {} training loss {} "
+                  "validation loss {} test err {}".format(epoch * 100.0 / num_of_epochs,
+                                                          float(gen_loss) / float(len(training_data)),
+                                                          training_loss, validation_loss, test_err))
     check_error(test, model, word_to_ix, tag_to_ix, True)
 
     print("plotting loss curve")
@@ -228,4 +235,3 @@ def get_chords(lyrics):
 if __name__ == '__main__':
     main()
     #get_chords([['hey','there', 'beautiful', 'girl'],['youre', 'so' ,'beautiful']])
-

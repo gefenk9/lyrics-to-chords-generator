@@ -29,7 +29,7 @@ def prep_data():
     nums = 0
     for file_name in os.listdir(dir):
         try:
-            if nums < 100:
+            if nums < 1000:
                 file = file_name.split('.')[0]
                 training_data = []
                 with open(os.path.join(dir, file+".df"), "rb+") as f:
