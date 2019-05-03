@@ -20,9 +20,30 @@ class App extends Component {
   };
 
   render() {
-    let chords;
-    if (this.state.chords) {
-      chords = <pre>{JSON.stringify(this.state.chords, null, 4)}</pre>;
+    let body;
+    if (this.state.answer) {
+      body = <p style={{ lineHeight: 1.2 }}>{this.state.answer}</p>;
+    } else {
+      body = (
+        <Form autoComplete="off">
+          <TextArea
+            id="input-lyrics"
+            placeholder="Lyrics..."
+            style={{ minHeight: 200, minWidth: 300 }}
+            onChange={this.updateInputLyrics}
+          />
+          <br />
+          <Button
+            loading={this.state.loadingAPI}
+            onClick={this.submit}
+            style={{ marginTop: "10px" }}
+            disabled={this.state.inputLyrics.trim().length === 0}
+            color="blue"
+          >
+            Submit
+          </Button>
+        </Form>
+      );
     }
 
     return (
@@ -37,25 +58,7 @@ class App extends Component {
             }}
           />
           <h1>Lyrics to Chords</h1>
-          <Form autoComplete="off">
-            <TextArea
-              id="input-lyrics"
-              placeholder="Lyrics..."
-              style={{ minHeight: 200, minWidth: 300 }}
-              onChange={this.updateInputLyrics}
-            />
-            <br />
-            <Button
-              loading={this.state.loadingAPI}
-              onClick={this.submit}
-              style={{ marginTop: "10px" }}
-              disabled={this.state.inputLyrics.trim().length === 0}
-              color="blue"
-            >
-              Submit
-            </Button>
-          </Form>
-          {chords}
+          {body}
         </header>
         {this.getFooter()}
       </div>
@@ -67,7 +70,10 @@ class App extends Component {
 
     let apiUrl =
       "http://ec2-34-245-176-135.eu-west-1.compute.amazonaws.com/to_chords";
-    if (window.location.hostname === "localhost") {
+    if (
+      window.location.hostname === "localhost" &&
+      window.location.host !== "localhost:3000"
+    ) {
       apiUrl = `http://${window.location.host}/to_chords`;
     }
 
@@ -95,8 +101,27 @@ class App extends Component {
 
     const respJson = await resp.json();
 
+    const answer = this.state.inputLyrics
+      .split("\n")
+      .map((line, i) => {
+        if (line.trim().length === 0) {
+          return line;
+        }
+        if (!Array.isArray(respJson.chords[i])) {
+          return line;
+        }
+
+        return `${line} (${respJson.chords[i].join(" ")})`;
+      })
+      .map(line => (
+        <span>
+          {line}
+          <br />
+        </span>
+      ));
+
     this.setState({
-      chords: respJson.chords
+      answer: answer
     });
   };
 

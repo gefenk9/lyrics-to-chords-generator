@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/lyrics-to-chords-generator/precache-manifest.7c390f1ffccca0a657f617ed8ffe3f98.js"
+  "/lyrics-to-chords-generator/precache-manifest.33a2542b03184ceebf3f5d9602ebe75b.js"
 );
 
 workbox.clientsClaim();
