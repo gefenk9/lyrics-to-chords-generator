@@ -4,14 +4,14 @@ import torch.nn.functional as F
 import torch.optim as optim
 import random
 import time
-from create_training_data import prep_data
+from model.create_training_data import prep_data
 import matplotlib
 import matplotlib.pyplot as plt
 import glob
 import os
 import pickle
 torch.manual_seed(1)
-matplotlib.use('TkAgg')
+#matplotlib.use('TkAgg')
 #Hyper Parameters
 
 EMBEDDING_DIM = 32#4th root of
